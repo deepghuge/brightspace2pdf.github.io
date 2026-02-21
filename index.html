@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="description" content="brightspace2pdf merges Brightspace submission image attachments (HEIC/HEIF, JPG/JPEG, PNG) into one clean PDF — fully free and runs locally." />
+  <title>brightspace2pdf — Brightspace attachments → one PDF</title>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.04);
+      --stroke:rgba(255,255,255,.12);
+      --stroke2:rgba(255,255,255,.18);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.72);
+      --muted2:rgba(255,255,255,.55);
+      --shadow: 0 18px 70px rgba(0,0,0,.55);
+      --shadow2: 0 12px 42px rgba(0,0,0,.45);
+      --r:18px;
+      --r2:24px;
+      --ok:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --accent1:#60a5fa;
+      --accent2:#a78bfa;
+      --accent3:#22c55e;
+      --max: 1120px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 700px at -10% -20%, rgba(29,78,216,.75) 0%, rgba(29,78,216,0) 55%),
+        radial-gradient(900px 600px at 110% 10%, rgba(124,58,237,.70) 0%, rgba(124,58,237,0) 55%),
+        radial-gradient(900px 650px at 40% 120%, rgba(34,197,94,.20) 0%, rgba(34,197,94,0) 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    a{color:inherit}
+    .wrap{max-width:var(--max); margin:0 auto; padding:22px}
+
+    /* Topbar */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
+      padding:14px 16px;
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border-radius: var(--r2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      position: sticky; top: 14px; z-index: 20;
+    }
+    .brand{display:flex; align-items:center; gap:12px; min-width:0}
+    .logo{
+      width:40px; height:40px; border-radius:14px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      display:grid; place-items:center;
+      color:#0b1220; font-weight:900; letter-spacing:.6px;
+      flex:0 0 auto;
+    }
+    .brand h1{
+      font-size:14px; margin:0; line-height:1.1; letter-spacing:.2px;
+    }
+    .brand p{margin:2px 0 0 0; font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .nav{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+    .chip{
+      font-size:12px;
+      padding:8px 10px;
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      background: rgba(255,255,255,.05);
+      text-decoration:none;
+    }
+    .btn{
+      font-size:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--stroke2);
+      background: rgba(255,255,255,.10);
+      text-decoration:none;
+      font-weight:800;
+      letter-spacing:.2px;
+      display:inline-flex; align-items:center; gap:8px;
+      cursor:pointer;
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.95));
+      color:#0b1220;
+      border:0;
+    }
+
+    /* Hero */
+    .hero{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+      align-items:stretch;
+    }
+    @media (max-width: 980px){
+      .hero{grid-template-columns:1fr; }
+      .topbar{position:static}
+    }
+
+    .card{
+      border:1px solid var(--stroke);
+      border-radius: var(--r2);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+    .heroLeft{padding:20px 20px 18px 20px}
+    .kicker{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .pill{
+      font-size:12px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+    }
+    .pill.ok{border-color: rgba(34,197,94,.55); background: rgba(34,197,94,.10)}
+    .pill.warn{border-color: rgba(245,158,11,.55); background: rgba(245,158,11,.12)}
+    .heroTitle{
+      font-size:44px;
+      line-height:1.05;
+      margin:0 0 12px 0;
+      letter-spacing:-.6px;
+    }
+    @media (max-width: 520px){
+      .heroTitle{font-size:36px}
+    }
+    .heroDesc{
+      margin:0 0 16px 0;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.45;
+      max-width: 56ch;
+    }
+    .heroActions{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .heroActions .btn{padding:11px 14px}
+    .miniNote{margin-top:10px; font-size:12px; color:var(--muted2)}
+    .miniNote code{color:var(--text)}
+    .heroRight{display:flex; flex-direction:column}
+    .shot{
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding:16px;
+      position:relative;
+    }
+    .shotInner{
+      width:100%;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .shotInner img{width:100%; display:block}
+    .shotBadge{
+      position:absolute;
+      top:16px; right:16px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.35);
+      font-size:12px;
+      color: var(--muted);
+    }
+
+    /* Sections */
+    section{margin-top:18px}
+    .sectionHead{
+      display:flex; align-items:flex-end; justify-content:space-between; gap:14px;
+      margin: 10px 2px 10px;
+    }
+    .sectionHead h2{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.2px;
+    }
+    .sectionHead p{
+      margin:0;
+      font-size:12px;
+      color: var(--muted2);
+    }
+
+    .grid3{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+    @media (max-width: 980px){ .grid3{grid-template-columns:1fr} }
+
+    .feature{
+      padding:16px;
+      border-radius: var(--r2);
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+    }
+    .feature .icon{
+      width:38px; height:38px; border-radius:14px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      margin-bottom:10px;
+      font-weight:900;
+      color:#0b1220;
+      background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.95));
+    }
+    .feature h3{margin:0 0 6px 0; font-size:14px}
+    .feature p{margin:0; color:var(--muted); font-size:13px; line-height:1.45}
+
+    /* How it works */
+    .steps{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+    }
+    @media (max-width: 980px){ .steps{grid-template-columns:1fr} }
+    .step{
+      padding:14px;
+      border-radius: var(--r2);
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+    }
+    .stepNum{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:34px; height:34px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      font-weight:900;
+      margin-bottom:10px;
+    }
+    .step h4{margin:0 0 6px 0; font-size:14px}
+    .step p{margin:0; color:var(--muted); font-size:13px; line-height:1.45}
+
+    /* Gallery */
+    .gallery{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+    }
+    @media (max-width: 980px){ .gallery{grid-template-columns:1fr} }
+    .gItem{
+      border-radius: var(--r2);
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.22);
+      overflow:hidden;
+      position:relative;
+    }
+    .gItem img{width:100%; display:block}
+    .gCap{
+      position:absolute; left:10px; bottom:10px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.35);
+      font-size:12px;
+      color: var(--muted);
+    }
+
+    /* FAQ */
+    details{
+      border:1px solid var(--stroke);
+      border-radius: var(--r2);
+      background: rgba(255,255,255,.05);
+      padding: 12px 14px;
+    }
+    details + details{margin-top:10px}
+    summary{cursor:pointer; font-weight:800; font-size:13px}
+    details p{margin:10px 0 0 0; color:var(--muted); font-size:13px; line-height:1.45}
+
+    /* Footer */
+    footer{
+      margin:22px 0 10px;
+      color: var(--muted2);
+      font-size:12px;
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+
+    /* Subtle entrance */
+    .fadeIn{
+      animation: up .55s ease both;
+    }
+    @keyframes up{
+      from{opacity:0; transform: translateY(10px)}
+      to{opacity:1; transform: translateY(0)}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <div class="topbar fadeIn">
+      <div class="brand">
+        <div class="logo">B2P</div>
+        <div style="min-width:0">
+          <h1>brightspace2pdf</h1>
+          <p>Brightspace attachments → one clean PDF (runs locally)</p>
+        </div>
+      </div>
+
+      <div class="nav">
+        <a class="chip" href="#features">Features</a>
+        <a class="chip" href="#how">How it works</a>
+        <a class="chip" href="#privacy">Privacy</a>
+        <a class="chip" href="#faq">FAQ</a>
+        <!-- Replace CHROME_WEB_STORE_URL with your listing -->
+        <a class="btn primary" href="CHROME_WEB_STORE_URL" target="_blank" rel="noreferrer">
+          Install from Chrome Web Store →
+        </a>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="card heroLeft fadeIn">
+        <div class="kicker">
+          <span class="pill ok">Fully free</span>
+          <span class="pill">HEIC/HEIF • JPG/JPEG • PNG</span>
+          <span class="pill">No uploads</span>
+          <!-- Update this if/when you expand -->
+          <span class="pill warn">Enabled for: learn-brightspace.cua.edu</span>
+        </div>
+
+        <h2 class="heroTitle">Grade faster.<br/>One PDF per submission.</h2>
+
+        <p class="heroDesc">
+          brightspace2pdf finds attachment download links on a Brightspace submission page,
+          downloads the images using your existing session, converts them locally in your browser,
+          and produces a single combined PDF ready to save.
+        </p>
+
+        <div class="heroActions">
+          <a class="btn primary" href="CHROME_WEB_STORE_URL" target="_blank" rel="noreferrer">Install</a>
+          <a class="btn" href="#how">See how it works</a>
+          <!-- Replace SUPPORT_EMAIL -->
+          <a class="btn" href="mailto:SUPPORT_EMAIL?subject=brightspace2pdf%20bug%20report">Report a bug</a>
+        </div>
+
+        <div class="miniNote">
+          Tip: If you see 0 attachments, hard refresh Brightspace (<code>Ctrl</code>+<code>Shift</code>+<code>R</code>) and scroll to load attachments.
+        </div>
+      </div>
+
+      <div class="card heroRight fadeIn">
+        <div class="shot">
+          <div class="shotBadge">Screenshot preview</div>
+          <div class="shotInner">
+            <!-- Put your best marketplace image here -->
+            <img src="assets/brightspace2pdf_hero.png" alt="brightspace2pdf screenshot" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="features" class="fadeIn">
+      <div class="sectionHead">
+        <h2>What it does</h2>
+        <p>Single purpose. Narrow permissions. Local processing.</p>
+      </div>
+
+      <div class="grid3">
+        <div class="feature">
+          <div class="icon">PDF</div>
+          <h3>Merges attachments into one PDF</h3>
+          <p>Converts multiple student image attachments into a single document that’s easy to grade.</p>
+        </div>
+
+        <div class="feature">
+          <div class="icon">HEIC</div>
+          <h3>Supports iPhone HEIC/HEIF</h3>
+          <p>Handles HEIC/HEIF (plus JPG/JPEG/PNG) so you don’t open files one-by-one.</p>
+        </div>
+
+        <div class="feature">
+          <div class="icon">🔒</div>
+          <h3>Runs locally (no uploads)</h3>
+          <p>Uses your existing Brightspace session to fetch attachments and builds the PDF on your device.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="how" class="fadeIn">
+      <div class="sectionHead">
+        <h2>How it works</h2>
+        <p>Simple workflow for instructors and TAs.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="stepNum">1</div>
+          <h4>Open a submission</h4>
+          <p>Go to a Brightspace submission page where attachments are visible.</p>
+        </div>
+        <div class="step">
+          <div class="stepNum">2</div>
+          <h4>Open the extension</h4>
+          <p>It scans for Brightspace “Download” items and collects the attachment links.</p>
+        </div>
+        <div class="step">
+          <div class="stepNum">3</div>
+          <h4>Create PDF</h4>
+          <p>A builder tab fetches and converts images (including HEIC) and assembles a PDF.</p>
+        </div>
+        <div class="step">
+          <div class="stepNum">4</div>
+          <h4>Save</h4>
+          <p>Your combined PDF downloads through the browser’s normal download flow.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="fadeIn">
+      <div class="sectionHead">
+        <h2>Screenshots</h2>
+        <p>Replace the image files in <code>/assets</code>.</p>
+      </div>
+
+      <div class="gallery">
+        <div class="gItem">
+          <img src="assets/screen_1.png" alt="Step 1 screenshot" />
+          <div class="gCap">Detect attachments</div>
+        </div>
+        <div class="gItem">
+          <img src="assets/screen_2.png" alt="Step 2 screenshot" />
+          <div class="gCap">Create PDF</div>
+        </div>
+        <div class="gItem">
+          <img src="assets/screen_3.png" alt="Step 3 screenshot" />
+          <div class="gCap">Download</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy" class="fadeIn">
+      <div class="sectionHead">
+        <h2>Privacy</h2>
+        <p>Short, direct, reviewer-friendly.</p>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <p style="margin:0; color:var(--muted); line-height:1.55; font-size:13px">
+          brightspace2pdf processes only the Brightspace submission attachments you already have access to.
+          It extracts attachment download links from the submission page, fetches those files using your existing
+          Brightspace session, and generates the PDF locally in your browser.
+          <br/><br/>
+          <b style="color:var(--text)">No files are uploaded</b> to external servers by this extension.
+        </p>
+      </div>
+    </section>
+
+    <section id="faq" class="fadeIn">
+      <div class="sectionHead">
+        <h2>FAQ</h2>
+        <p>Common questions.</p>
+      </div>
+
+      <details>
+        <summary>Why do I see 0 attachments?</summary>
+        <p>Brightspace sometimes loads attachment menus after the page is visible. Hard refresh (<b>Ctrl+Shift+R</b>), scroll a bit so attachments render, then open the extension again.</p>
+      </details>
+
+      <details>
+        <summary>Does this upload student work anywhere?</summary>
+        <p>No. The PDF is generated locally and saved via your browser’s download flow.</p>
+      </details>
+
+      <details>
+        <summary>Which Brightspace sites are supported?</summary>
+        <p>Right now the extension is enabled for <b>learn-brightspace.cua.edu</b>. Expanding to more institutions requires adding their Brightspace domains to the extension’s allowed sites.</p>
+      </details>
+
+      <details>
+        <summary>Is this affiliated with D2L / Brightspace?</summary>
+        <p>No. This project is not affiliated with or endorsed by D2L / Brightspace.</p>
+      </details>
+    </section>
+
+    <section class="fadeIn">
+      <div class="sectionHead">
+        <h2>Support</h2>
+        <p>Fastest way: email with details + screenshot.</p>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <p style="margin:0 0 10px 0; color:var(--muted); font-size:13px; line-height:1.55">
+          If something breaks, send a screenshot and note your Brightspace page URL (no student content needed).
+        </p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <a class="btn" href="mailto:SUPPORT_EMAIL?subject=brightspace2pdf%20bug%20report">Report a bug</a>
+          <a class="btn" href="mailto:SUPPORT_EMAIL?subject=brightspace2pdf%20feature%20request">Request a feature</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>© <span id="year"></span> brightspace2pdf — fully free.</div>
+      <div>Not affiliated with or endorsed by D2L / Brightspace.</div>
+    </footer>
+
+  </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
