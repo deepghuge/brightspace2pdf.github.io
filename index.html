@@ -10,7 +10,6 @@
   <style>
     :root{
       --bg:#0b1220;
-      --card:rgba(255,255,255,.06);
       --stroke:rgba(255,255,255,.12);
       --stroke2:rgba(255,255,255,.18);
       --text:rgba(255,255,255,.92);
@@ -18,7 +17,6 @@
       --muted2:rgba(255,255,255,.55);
       --shadow: 0 18px 70px rgba(0,0,0,.55);
       --shadow2: 0 12px 42px rgba(0,0,0,.45);
-      --r:18px;
       --r2:24px;
       --ok:#22c55e;
       --warn:#f59e0b;
@@ -90,10 +88,6 @@
       background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.95));
       color:#0b1220;
       border:0;
-    }
-    .btn:disabled{
-      opacity:.55;
-      cursor:not-allowed;
     }
 
     .card{
@@ -198,8 +192,6 @@
       font-size:13px;
       line-height:1.45;
     }
-    .notice b{color: rgba(255,255,255,.95)}
-    .notice code{color: rgba(255,255,255,.92)}
 
     details{
       margin-top:10px;
@@ -217,19 +209,13 @@
       font-size:12px;
       display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
     }
-
-    .fadeIn{animation: up .55s ease both}
-    @keyframes up{
-      from{opacity:0; transform: translateY(10px)}
-      to{opacity:1; transform: translateY(0)}
-    }
   </style>
 </head>
 
 <body>
   <div class="wrap">
 
-    <div class="topbar fadeIn">
+    <div class="topbar">
       <div class="brand">
         <div class="logo">B2P</div>
         <div style="min-width:0">
@@ -240,20 +226,26 @@
 
       <div class="nav">
         <a class="chip" href="#how">How it works</a>
-        <a class="chip" href="privacy.html">Privacy policy</a>
 
-        <!-- Install button is disabled until published -->
+        <!-- privacy.md will render at /privacy on GitHub Pages (Jekyll) -->
+        <a class="chip" href="privacy">Privacy policy</a>
+
+        <!-- Install button disabled until you publish -->
         <a class="btn primary" href="#" aria-disabled="true" title="Chrome Web Store link will be added after publishing">
           Install (will be updated)
         </a>
 
-        <a class="btn" href="mailto:SUPPORT_EMAIL?subject=brightspace2pdf%20bug%20report">
+        <!-- Email only inside mailto links (not displayed as text) -->
+        <a class="btn" href="mailto:deepghuge09@gmail.com?subject=brightspace2pdf%20bug%20report">
           Report a bug
+        </a>
+        <a class="btn" href="mailto:deepghuge09@gmail.com?subject=brightspace2pdf%20feature%20request">
+          Request a feature
         </a>
       </div>
     </div>
 
-    <div class="card fadeIn">
+    <div class="card">
       <div class="kicker">
         <span class="pill ok">Fully free</span>
         <span class="pill">HEIC/HEIF • JPG/JPEG • PNG</span>
@@ -286,7 +278,7 @@
         </div>
       </div>
 
-      <div class="sectionHead" style="margin-top:18px; display:flex; align-items:flex-end; justify-content:space-between; gap:14px;">
+      <div style="margin-top:18px; display:flex; align-items:flex-end; justify-content:space-between; gap:14px;">
         <h2 id="how" style="margin:0; font-size:18px; letter-spacing:.2px;">How it works</h2>
         <p style="margin:0; font-size:12px; color:var(--muted2);">Simple workflow for instructors and TAs.</p>
       </div>
@@ -315,8 +307,7 @@
       </div>
 
       <div class="notice">
-        <b>Chrome Web Store link:</b> will be added after publishing. <br/>
-        <b>Support:</b> use “Report a bug” to email details + a screenshot (no student content needed).
+        <b>Chrome Web Store link:</b> will be added after publishing.
       </div>
 
       <details>
@@ -324,15 +315,6 @@
         <p>
           Brightspace sometimes renders attachment menus after the page is visible.
           Hard refresh (<b>Ctrl+Shift+R</b>), scroll a bit so attachments load, then open the extension again.
-        </p>
-      </details>
-
-      <details>
-        <summary>Privacy (short version)</summary>
-        <p>
-          brightspace2pdf processes only the Brightspace submission attachments you already have access to.
-          It extracts attachment links from the page and builds the PDF locally in your browser.
-          <b>No files are uploaded</b> to external servers by this extension.
         </p>
       </details>
 
@@ -346,14 +328,13 @@
 
     <footer>
       <div>© <span id="year"></span> brightspace2pdf — fully free.</div>
-      <div><a href="privacy.html">Privacy policy</a> · Not affiliated with D2L / Brightspace.</div>
+      <div><a href="privacy">Privacy policy</a> · Not affiliated with D2L / Brightspace.</div>
     </footer>
 
   </div>
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
-
     // Make the "Install" button non-clickable until you publish
     document.querySelectorAll('a[aria-disabled="true"]').forEach(a => {
       a.addEventListener("click", (e) => e.preventDefault());
