@@ -8,7 +8,7 @@ title: Privacy Policy — brightspace2pdf
 
 brightspace2pdf is a Chrome extension that helps instructors and teaching assistants convert Brightspace submission image attachments into a single combined PDF for easier grading.
 
-## Summary (plain English)
+## Summary 
 - **No uploads:** brightspace2pdf does **not** upload files to any external server.
 - **Local processing:** image conversion and PDF generation happen **locally in your browser**.
 - **No tracking:** brightspace2pdf does **not** sell data, run ads, or use analytics.
