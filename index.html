@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#0b1220" />
-  <meta name="description" content="brightspace2pdf merges Brightspace submission image attachments (HEIC/HEIF, JPG/JPEG, PNG) into one clean PDF — fully free and runs locally." />
-  <title>brightspace2pdf — Brightspace attachments → one PDF</title>
+  <meta name="description" content="brightspace2pdf / Brightspace PDF Merger (D2L) merges Brightspace submission image attachments (HEIC/HEIF, JPG/JPEG, PNG) into one clean PDF — fully free and runs locally." />
+  <title>brightspace2pdf / Brightspace PDF Merger (D2L) — attachments → one PDF</title>
 
   <style>
     :root{
@@ -220,14 +220,12 @@
         <div class="logo">B2P</div>
         <div style="min-width:0">
           <h1>brightspace2pdf</h1>
-          <p>Brightspace attachments → one clean PDF (runs locally)</p>
+          <p>Brightspace (D2L) attachments → one clean PDF (runs locally)</p>
         </div>
       </div>
 
       <div class="nav">
         <a class="chip" href="#how">How it works</a>
-
-        <!-- privacy.md will render at /privacy on GitHub Pages (Jekyll) -->
         <a class="chip" href="privacy">Privacy policy</a>
 
         <!-- Install button disabled until you publish -->
@@ -235,7 +233,6 @@
           Install (will be updated)
         </a>
 
-        <!-- Email only inside mailto links (not displayed as text) -->
         <a class="btn" href="mailto:deepghuge09@gmail.com?subject=brightspace2pdf%20bug%20report">
           Report a bug
         </a>
@@ -250,7 +247,7 @@
         <span class="pill ok">Fully free</span>
         <span class="pill">HEIC/HEIF • JPG/JPEG • PNG</span>
         <span class="pill">No uploads</span>
-        <span class="pill warn">Enabled for: learn-brightspace.cua.edu</span>
+        <span class="pill warn">Works on any Brightspace site you approve</span>
       </div>
 
       <h2 class="heroTitle">Grade faster.<br/>One PDF per submission.</h2>
@@ -292,7 +289,7 @@
         <div class="step">
           <div class="stepNum">2</div>
           <h4>Open the extension</h4>
-          <p>It scans for Brightspace “Download” items and collects attachment links.</p>
+          <p>It scans for Brightspace attachment items and collects download links.</p>
         </div>
         <div class="step">
           <div class="stepNum">3</div>
@@ -315,6 +312,8 @@
         <p>
           Brightspace sometimes renders attachment menus after the page is visible.
           Hard refresh (<b>Ctrl+Shift+R</b>), scroll a bit so attachments load, then open the extension again.
+          If it shows files from a different submission, go to the next submission using the top-right arrow, then come
+          back and reopen the extension to force Brightspace to refresh the attachment list.
         </p>
       </details>
 
